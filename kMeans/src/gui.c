@@ -76,3 +76,53 @@ void draw_centroid(Point * centroid, SDL_Renderer** ptr_renderer, int red, int g
 
     return ;
 }
+
+/*
+* Render classified dataset.
+*/
+void draw_classified_dataset(Point * dataset, int dataset_size, SDL_Renderer** ptr_renderer)
+{
+    for(int i = 0; i < dataset_size; i++)
+    {
+        int class = dataset[i]._class;
+        SDL_SetRenderDrawColor(*ptr_renderer,  20*class*class, 40*class+10, 40, 150); // RGBA
+        SDL_Rect cr = {dataset[i].x, dataset[i].y, 2, 2};
+        SDL_RenderFillRect(*ptr_renderer, &cr);
+    }
+}
+
+/*
+* Render centroids dataset.
+*/
+void draw_centroids(Point * centroids, int k, SDL_Renderer** ptr_renderer)
+{
+    for(int i = 0; i < k; i++)
+    {
+        SDL_SetRenderDrawColor(*ptr_renderer, 255, 255, 255, 255); // RGBA
+        SDL_Rect cr = {centroids[i].x, centroids[i].y, 10, 10};
+        SDL_RenderFillRect(*ptr_renderer, &cr);
+    }
+
+    return ;
+}
+
+/*
+* Render decision boundaries.
+*/
+void draw_decision_boundaries(Point * centroids, int k, int width, int height, SDL_Renderer** ptr_renderer)
+{
+    for(int y = 0; y < height; y++)
+    {
+        for(int x = 0; x < width; x++)
+        {
+            Point p = {x,y,0};
+            int class = classify_point(p,centroids,k);
+
+            SDL_SetRenderDrawColor(*ptr_renderer,  20*class*class, 40*class+10, 40, 100); // RGBA
+            SDL_Rect cr = {x, y, 1, 1};
+            SDL_RenderFillRect(*ptr_renderer, &cr);
+        }
+    }
+
+    return ;
+}

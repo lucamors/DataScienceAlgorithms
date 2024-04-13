@@ -1,6 +1,7 @@
 // k-Means implementation
 #include <SDL.h>
 #include <time.h>
+
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -20,11 +21,14 @@ int main(int argc, char* argv[])
     // Create window and renderer
     SDL_Window* window     = create_window(WINDOW_WIDTH, WINDOW_HEIGHT);
     SDL_Renderer* renderer = create_renderer(&window);
+    // Enable alpha blending
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
     // Set window color to black
     clear_window(&renderer);
   
-    // Generate a random gaussian distribution
+    ////////////////////////////////////////////////////////////
+    // Generate k gaussian clusters dataset
     ////////////////////////////////////////////////////////////
 
     // Init random number generator
@@ -34,44 +38,58 @@ int main(int argc, char* argv[])
     Point dataset[N];
 
     GaussianDistribution g1 = {
-        .mu_x    = ((double)rand())/RAND_MAX * WINDOW_WIDTH,
-        .mu_y    = ((double)rand())/RAND_MAX * WINDOW_HEIGHT,
+        .mu_x    = ((double)rand())/RAND_MAX * WINDOW_WIDTH*0.8 + WINDOW_WIDTH*0.1,
+        .mu_y    = ((double)rand())/RAND_MAX * WINDOW_HEIGHT*0.8 + WINDOW_HEIGHT*0.1,
         .sigma_x = ((double)rand())/RAND_MAX * 40 + 10,
         .sigma_y = ((double)rand())/RAND_MAX * 40 + 10,
     };
 
     GaussianDistribution g2 = {
-        .mu_x    = ((double)rand())/RAND_MAX * WINDOW_WIDTH*0.2 + WINDOW_WIDTH*0.1,
-        .mu_y    = ((double)rand())/RAND_MAX * WINDOW_HEIGHT*0.2 + WINDOW_HEIGHT*0.1,
+        .mu_x    = ((double)rand())/RAND_MAX * WINDOW_WIDTH*0.8 + WINDOW_WIDTH*0.1,
+        .mu_y    = ((double)rand())/RAND_MAX * WINDOW_HEIGHT*0.8 + WINDOW_HEIGHT*0.1,
         .sigma_x = ((double)rand())/RAND_MAX * 40 + 10,
         .sigma_y = ((double)rand())/RAND_MAX * 40 + 10,
     };
 
+    GaussianDistribution g3 = {
+        .mu_x    = ((double)rand())/RAND_MAX * WINDOW_WIDTH*0.8 + WINDOW_WIDTH*0.1,
+        .mu_y    = ((double)rand())/RAND_MAX * WINDOW_HEIGHT*0.8 + WINDOW_HEIGHT*0.1,
+        .sigma_x = ((double)rand())/RAND_MAX * 40 + 10,
+        .sigma_y = ((double)rand())/RAND_MAX * 40 + 10,
+    };
 
-    generate_gaussian_clusters_dataset(dataset, N, &g1, &g2);
+    GaussianDistribution gaussian_distributions[3] = {g1,g2,g3};
+
+
+    generate_gaussian_clusters_dataset(dataset, N, gaussian_distributions, 3);
 
     ////////////////////////////////////////////////////////////
     // k-Means Algorithm
     ////////////////////////////////////////////////////////////
 
     // 1. Initialization Phase
-    int i1 = (int)(((double)rand())/RAND_MAX*N);
-    int i2 = (int)(((double)rand())/RAND_MAX*N);
-    
-    Point centroid1 = { .x = dataset[i1].x, .y = dataset[i1].y };
-    Point centroid2 = { .x = dataset[i2].x, .y = dataset[i2].y };
 
+    const int k = 3;
+    Point centroids[k];
 
+    for(int i = 0; i < k; i++)
+    {
+        int selected_element = rand()%N;
+        
+        centroids[i].x = dataset[selected_element].x; 
+        centroids[i].y = dataset[selected_element].y; 
 
+    }
+
+    // SDL Visualization Loop
     SDL_Event e;
     bool quit = false;
-    // Main loop
     while (!quit) 
     {
 
         while (SDL_PollEvent(&e) != 0)
         {
-            // User requests quit
+            
             if (e.type == SDL_QUIT) 
             {
                 quit = 1;
@@ -82,109 +100,26 @@ int main(int argc, char* argv[])
                 {
                     case SDLK_UP:
                         
+                       
+                        // Classify Data
+                        classify_dataset(dataset, N, centroids, k);
 
-                        // 2. Assignement step
-                        for(int i = 0; i < N; i++)
-                        {
-                            // Computing distance between two centroids
-                            double d1 = sqrt( (centroid1.x-dataset[i].x)*(centroid1.x-dataset[i].x) + (centroid1.y-dataset[i].y)*(centroid1.y-dataset[i].y) );
-                            double d2 = sqrt( (centroid2.x-dataset[i].x)*(centroid2.x-dataset[i].x) + (centroid2.y-dataset[i].y)*(centroid2.y-dataset[i].y) );
-
-                            // Assign point to the closest cluster
-                            if( d1 > d2)
-                            {
-                                dataset[i]._class = 2; 
-                            }
-                            else
-                            {
-                                dataset[i]._class = 1;
-                            }
-                        }
-                        
-                        // 3. Centroid recompute step
-                        float mean1x = 0;
-                        float mean1y = 0;
-                        int c1 = 0;
-
-                        float mean2x = 0;
-                        float mean2y = 0;
-                        int c2 = 0;
-
-                        for(int i = 0; i < N; i++)
-                        {
-                            if(dataset[i]._class == 1)
-                            {
-                                mean1x += dataset[i].x;
-                                mean1y += dataset[i].y;
-                                c1++;
-                                // Set drawing color to blue
-                                SDL_SetRenderDrawColor(renderer, 150,0 , 0, 255); // RGBA
-                            }
-                            else
-                            {
-                                mean2x += dataset[i].x;
-                                mean2y += dataset[i].y;
-                                c2++; 
-                                SDL_SetRenderDrawColor(renderer, 0,0 , 150, 255); // RGBA
-                            }
-
-                            // Draw a filled rectangle
-                            SDL_Rect cr = {dataset[i].x, dataset[i].y, 1, 1};
-                            SDL_RenderFillRect(renderer, &cr);
-                        }
-
-                        // Updating centroid
-                    
-                        // Draw new centroid to canvas
-                        for (int k = 0; k < WINDOW_WIDTH; k++)
-                        {
-                            for(int l = 0; l < WINDOW_HEIGHT; l++)
-                            {
-                                double d1 = sqrt( (centroid1.x-k)*(centroid1.x-k) + (centroid1.y-l)*(centroid1.y-l) );
-                                double d2 = sqrt( (centroid2.x-k)*(centroid2.x-k) + (centroid2.y-l)*(centroid2.y-l) );
-
-                                // Assign point to the closest cluster
-                                if( d1 < d2)
-                                {
-                                    SDL_SetRenderDrawColor(renderer, 50,0 , 0, 100);
-                                    SDL_Rect cr = {k, l, 1, 1};
-                                    SDL_RenderFillRect(renderer, &cr);
-                                }
-                                else
-                                {
-                                    SDL_SetRenderDrawColor(renderer, 0,0 , 50, 100);
-                                    SDL_Rect cr = {k, l, 1, 1};
-                                    SDL_RenderFillRect(renderer, &cr);
-                                }
-                            }
-                        }
-
-                        for(int i = 0; i < N; i++)
-                        {
-                            if(dataset[i]._class == 1)
-                            {
-                                SDL_SetRenderDrawColor(renderer, 150,0 , 0, 255); // RGBA
-                            }
-                            else
-                            {
-                                SDL_SetRenderDrawColor(renderer, 0,0 , 150, 255); // RGBA
-                            }
-
-                            // Draw a filled rectangle
-                            SDL_Rect cr = {dataset[i].x, dataset[i].y, 1, 1};
-                            SDL_RenderFillRect(renderer, &cr);
-                        }
-                        
-                        draw_centroid(&centroid1, &renderer, 255,0,0);
-                        draw_centroid(&centroid2, &renderer, 0,0,255);
-
-                        SDL_RenderPresent(renderer);
-
-                        // SDL_Delay(2000);
-                        update_centroid(&centroid1, mean1x/c1, mean1y/c1);
-                        update_centroid(&centroid2, mean2x/c2, mean2y/c2);
-
+                        // Render k-Means algorithm state to SDL_Window
+                       
+                        // Clear Window
                         clear_window(&renderer);
+
+                        draw_decision_boundaries(centroids, k, WINDOW_WIDTH, WINDOW_HEIGHT, &renderer);
+                        draw_classified_dataset(dataset, N, &renderer);
+                        draw_centroids(centroids, k, &renderer);
+
+                        // Render all to screen                        
+                        SDL_RenderPresent(renderer);
+                        
+                        // Recompute centroids
+                        recompute_centroids(dataset,N,centroids,k);
+                                                
+
 
                         break;
 

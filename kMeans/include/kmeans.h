@@ -29,10 +29,23 @@ double compute_euclidean_distance(Point, Point);
 
 //----------------------------------------------------//
 
-void generate_gaussian_clusters_dataset(Point*, int, GaussianDistribution*, GaussianDistribution*);
+void generate_gaussian_clusters_dataset(Point*, int, GaussianDistribution*, int);
 
 //----------------------------------------------------//
 
 void update_centroid(Point *, double, double);
+
+//----------------------------------------------------//
+
+void classify_dataset(Point* , int , Point* , int);
+
+//----------------------------------------------------//
+
+void recompute_centroids(Point* , int , Point* , int);
+
+//----------------------------------------------------//
+
+int classify_point(Point, Point*, int);
+
 
 #endif
