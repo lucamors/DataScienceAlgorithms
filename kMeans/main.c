@@ -50,6 +50,7 @@ int main(int argc, char* argv[])
 
     generate_gaussian_clusters_dataset(dataset, N, &g1, &g2);
 
+    ////////////////////////////////////////////////////////////
     // k-Means Algorithm
     ////////////////////////////////////////////////////////////
 
@@ -60,113 +61,140 @@ int main(int argc, char* argv[])
     Point centroid1 = { .x = dataset[i1].x, .y = dataset[i1].y };
     Point centroid2 = { .x = dataset[i2].x, .y = dataset[i2].y };
 
-    
-    for (size_t j = 0; j < 5; j++)
+
+
+    SDL_Event e;
+    bool quit = false;
+    // Main loop
+    while (!quit) 
     {
-        // 2. Assignement step
-        for(int i = 0; i < N; i++)
+
+        while (SDL_PollEvent(&e) != 0)
         {
-            // Computing distance between two centroids
-            double d1 = sqrt( (centroid1.x-dataset[i].x)*(centroid1.x-dataset[i].x) + (centroid1.y-dataset[i].y)*(centroid1.y-dataset[i].y) );
-            double d2 = sqrt( (centroid2.x-dataset[i].x)*(centroid2.x-dataset[i].x) + (centroid2.y-dataset[i].y)*(centroid2.y-dataset[i].y) );
-
-            // Assign point to the closest cluster
-            if( d1 > d2)
+            // User requests quit
+            if (e.type == SDL_QUIT) 
             {
-                dataset[i]._class = 2; 
+                quit = 1;
             }
-            else
+            else if (e.type == SDL_KEYDOWN) 
             {
-                dataset[i]._class = 1;
-            }
-        }
-        
-        // 3. Centroid recompute step
-        float mean1x = 0;
-        float mean1y = 0;
-        int c1 = 0;
-
-        float mean2x = 0;
-        float mean2y = 0;
-        int c2 = 0;
-
-        for(int i = 0; i < N; i++)
-        {
-            if(dataset[i]._class == 1)
-            {
-                mean1x += dataset[i].x;
-                mean1y += dataset[i].y;
-                c1++;
-                // Set drawing color to blue
-                SDL_SetRenderDrawColor(renderer, 150,0 , 0, 255); // RGBA
-            }
-            else
-            {
-                mean2x += dataset[i].x;
-                mean2y += dataset[i].y;
-                c2++; 
-                SDL_SetRenderDrawColor(renderer, 0,0 , 150, 255); // RGBA
-            }
-
-            // Draw a filled rectangle
-            SDL_Rect cr = {dataset[i].x, dataset[i].y, 1, 1};
-            SDL_RenderFillRect(renderer, &cr);
-        }
-
-        // Updating centroid
-        update_centroid(&centroid1, mean1x/c1, mean1y/c1);
-        update_centroid(&centroid2, mean2x/c2, mean2y/c2);
-
-        // Draw new centroid to canvas
-        for (int k = 0; k < WINDOW_WIDTH; k++)
-        {
-            for(int l = 0; l < WINDOW_HEIGHT; l++)
-            {
-                double d1 = sqrt( (centroid1.x-k)*(centroid1.x-k) + (centroid1.y-l)*(centroid1.y-l) );
-                double d2 = sqrt( (centroid2.x-k)*(centroid2.x-k) + (centroid2.y-l)*(centroid2.y-l) );
-
-                // Assign point to the closest cluster
-                if( d1 < d2)
+                switch (e.key.keysym.sym) 
                 {
-                    SDL_SetRenderDrawColor(renderer, 50,0 , 0, 100);
-                    SDL_Rect cr = {k, l, 1, 1};
-                    SDL_RenderFillRect(renderer, &cr);
-                }
-                else
-                {
-                    SDL_SetRenderDrawColor(renderer, 0,0 , 50, 100);
-                    SDL_Rect cr = {k, l, 1, 1};
-                    SDL_RenderFillRect(renderer, &cr);
+                    case SDLK_UP:
+                        
+
+                        // 2. Assignement step
+                        for(int i = 0; i < N; i++)
+                        {
+                            // Computing distance between two centroids
+                            double d1 = sqrt( (centroid1.x-dataset[i].x)*(centroid1.x-dataset[i].x) + (centroid1.y-dataset[i].y)*(centroid1.y-dataset[i].y) );
+                            double d2 = sqrt( (centroid2.x-dataset[i].x)*(centroid2.x-dataset[i].x) + (centroid2.y-dataset[i].y)*(centroid2.y-dataset[i].y) );
+
+                            // Assign point to the closest cluster
+                            if( d1 > d2)
+                            {
+                                dataset[i]._class = 2; 
+                            }
+                            else
+                            {
+                                dataset[i]._class = 1;
+                            }
+                        }
+                        
+                        // 3. Centroid recompute step
+                        float mean1x = 0;
+                        float mean1y = 0;
+                        int c1 = 0;
+
+                        float mean2x = 0;
+                        float mean2y = 0;
+                        int c2 = 0;
+
+                        for(int i = 0; i < N; i++)
+                        {
+                            if(dataset[i]._class == 1)
+                            {
+                                mean1x += dataset[i].x;
+                                mean1y += dataset[i].y;
+                                c1++;
+                                // Set drawing color to blue
+                                SDL_SetRenderDrawColor(renderer, 150,0 , 0, 255); // RGBA
+                            }
+                            else
+                            {
+                                mean2x += dataset[i].x;
+                                mean2y += dataset[i].y;
+                                c2++; 
+                                SDL_SetRenderDrawColor(renderer, 0,0 , 150, 255); // RGBA
+                            }
+
+                            // Draw a filled rectangle
+                            SDL_Rect cr = {dataset[i].x, dataset[i].y, 1, 1};
+                            SDL_RenderFillRect(renderer, &cr);
+                        }
+
+                        // Updating centroid
+                    
+                        // Draw new centroid to canvas
+                        for (int k = 0; k < WINDOW_WIDTH; k++)
+                        {
+                            for(int l = 0; l < WINDOW_HEIGHT; l++)
+                            {
+                                double d1 = sqrt( (centroid1.x-k)*(centroid1.x-k) + (centroid1.y-l)*(centroid1.y-l) );
+                                double d2 = sqrt( (centroid2.x-k)*(centroid2.x-k) + (centroid2.y-l)*(centroid2.y-l) );
+
+                                // Assign point to the closest cluster
+                                if( d1 < d2)
+                                {
+                                    SDL_SetRenderDrawColor(renderer, 50,0 , 0, 100);
+                                    SDL_Rect cr = {k, l, 1, 1};
+                                    SDL_RenderFillRect(renderer, &cr);
+                                }
+                                else
+                                {
+                                    SDL_SetRenderDrawColor(renderer, 0,0 , 50, 100);
+                                    SDL_Rect cr = {k, l, 1, 1};
+                                    SDL_RenderFillRect(renderer, &cr);
+                                }
+                            }
+                        }
+
+                        for(int i = 0; i < N; i++)
+                        {
+                            if(dataset[i]._class == 1)
+                            {
+                                SDL_SetRenderDrawColor(renderer, 150,0 , 0, 255); // RGBA
+                            }
+                            else
+                            {
+                                SDL_SetRenderDrawColor(renderer, 0,0 , 150, 255); // RGBA
+                            }
+
+                            // Draw a filled rectangle
+                            SDL_Rect cr = {dataset[i].x, dataset[i].y, 1, 1};
+                            SDL_RenderFillRect(renderer, &cr);
+                        }
+                        
+                        draw_centroid(&centroid1, &renderer, 255,0,0);
+                        draw_centroid(&centroid2, &renderer, 0,0,255);
+
+                        SDL_RenderPresent(renderer);
+
+                        // SDL_Delay(2000);
+                        update_centroid(&centroid1, mean1x/c1, mean1y/c1);
+                        update_centroid(&centroid2, mean2x/c2, mean2y/c2);
+
+                        clear_window(&renderer);
+
+                        break;
+
+                    default:
+
+                        break;
                 }
             }
         }
-
-        for(int i = 0; i < N; i++)
-        {
-            if(dataset[i]._class == 1)
-            {
-                SDL_SetRenderDrawColor(renderer, 150,0 , 0, 255); // RGBA
-    
-            }
-            else
-            {
-                SDL_SetRenderDrawColor(renderer, 0,0 , 150, 255); // RGBA
-            }
-
-            // Draw a filled rectangle
-            SDL_Rect cr = {dataset[i].x, dataset[i].y, 1, 1};
-            SDL_RenderFillRect(renderer, &cr);
-        }
-        
-        draw_centroid(&centroid1, &renderer, 255,0,0);
-        draw_centroid(&centroid2, &renderer, 0,0,255);
-
-        SDL_RenderPresent(renderer);
-
-        SDL_Delay(2000);
-        clear_window(&renderer);
     }
-    
     // Cleanup
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
