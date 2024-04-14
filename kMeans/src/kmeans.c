@@ -16,7 +16,7 @@ double compute_euclidean_distance(Point p1, Point p2)
 }
 
 /*
-* Generate a dataset having two gaussian clusters 
+* Generate a dataset having "number_of_distributions" gaussian clusters 
 */
 void generate_gaussian_clusters_dataset(Point* point_array, int counts, GaussianDistribution* gaussian_distribution_array, int number_of_distributions)
 {
@@ -24,16 +24,15 @@ void generate_gaussian_clusters_dataset(Point* point_array, int counts, Gaussian
     for (int i = 0; i < counts; i++)
     {
         
-
         int selected_distribution = i%number_of_distributions;
         
         // Draw a sample from the selected distribution
-        Point p = {0,0,0};
+        // new point class is initialized to -1 as point is unclassified
+        Point p = {0,0,-1};
         p.x = generate_gaussian(gaussian_distribution_array[selected_distribution].mu_x,gaussian_distribution_array[selected_distribution].sigma_x);
         p.y = generate_gaussian(gaussian_distribution_array[selected_distribution].mu_y,gaussian_distribution_array[selected_distribution].sigma_y);
         
-        // Set class to -1 as point is unclassified
-        p._class = -1;
+        // Save point to array
         point_array[i] = p; 
     }
 
@@ -41,7 +40,9 @@ void generate_gaussian_clusters_dataset(Point* point_array, int counts, Gaussian
     
 }
 
-
+/*
+* Initialize centroid position using the specified initialization method
+*/
 void initialize_centroids(Point* centroids, int k, Point* dataset, int dataset_size, initialization_method method)
 {
     switch(method)
@@ -90,7 +91,7 @@ void recompute_centroids(Point* dataset, int dataset_size, Point* centroids, int
         centroids[i].x = 0;
         centroids[i].y = 0;
 
-        // Here we can use Point _class member as element counts
+        // Here we can use Point '_class' member as element counter
         centroids[i]._class = 0;
     }
 
@@ -111,10 +112,9 @@ void recompute_centroids(Point* dataset, int dataset_size, Point* centroids, int
         centroids[i].x /= centroids[i]._class;
         centroids[i].y /= centroids[i]._class;
 
-        // Assign centroid to its class for consistency
+        // Assign centroid._class back to its class for consistency (optional)
         centroids[i]._class = i;
     }
-
 
     return ;
 }
