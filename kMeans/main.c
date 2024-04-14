@@ -1,7 +1,6 @@
 // k-Means implementation
 #include <SDL.h>
 #include <time.h>
-
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -48,7 +47,6 @@ int main(int argc, char* argv[])
         gaussian_distributions[i].sigma_y = ((double)rand())/RAND_MAX * 40 + 10;
     }
     
-
     generate_gaussian_clusters_dataset(dataset, N, gaussian_distributions, k);
 
     ////////////////////////////////////////////////////////////
@@ -56,17 +54,9 @@ int main(int argc, char* argv[])
     ////////////////////////////////////////////////////////////
 
     // 1. Initialization Phase
-
     Point centroids[k];
-
-    for(int i = 0; i < k; i++)
-    {
-        int selected_element = rand()%N;
-        
-        centroids[i].x = dataset[selected_element].x; 
-        centroids[i].y = dataset[selected_element].y; 
-
-    }
+    initialize_centroids(centroids, k, dataset, N, FORGY);
+    
 
     // Drawing the dataset to screen
     draw_classified_dataset(dataset, N, &renderer);

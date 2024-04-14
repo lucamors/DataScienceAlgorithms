@@ -1,4 +1,6 @@
+#include <stdio.h>
 #include <float.h>
+
 
 #include "kmeans.h"
 #include "gaussian_distribution.h"
@@ -37,6 +39,29 @@ void generate_gaussian_clusters_dataset(Point* point_array, int counts, Gaussian
 
     return ;
     
+}
+
+
+void initialize_centroids(Point* centroids, int k, Point* dataset, int dataset_size, initialization_method method)
+{
+    switch(method)
+    {
+        case FORGY:
+            for(int i = 0; i < k; i++)
+            {
+                int selected_element = rand()%dataset_size;
+                
+                centroids[i].x = dataset[selected_element].x; 
+                centroids[i].y = dataset[selected_element].y; 
+
+            }
+            break;
+
+        default:
+            printf("No valid initialization method provided. Exit.");
+            exit(-1);
+            break;
+    }
 }
 
 /*

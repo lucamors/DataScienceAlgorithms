@@ -25,11 +25,24 @@ typedef struct Point{
 
 //----------------------------------------------------//
 
+typedef enum {
+    
+    FORGY,
+    RANDOM_PARTITION
+
+} initialization_method; 
+
+//----------------------------------------------------//
+
 double compute_euclidean_distance(Point, Point);
 
 //----------------------------------------------------//
 
 void generate_gaussian_clusters_dataset(Point*, int, GaussianDistribution*, int);
+
+//----------------------------------------------------//
+
+void initialize_centroids(Point*, int, Point*, int, initialization_method);
 
 //----------------------------------------------------//
 
