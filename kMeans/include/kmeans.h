@@ -33,10 +33,6 @@ void generate_gaussian_clusters_dataset(Point*, int, GaussianDistribution*, int)
 
 //----------------------------------------------------//
 
-void update_centroid(Point *, double, double);
-
-//----------------------------------------------------//
-
 void classify_dataset(Point* , int , Point* , int);
 
 //----------------------------------------------------//

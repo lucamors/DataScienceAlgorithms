@@ -40,18 +40,6 @@ void generate_gaussian_clusters_dataset(Point* point_array, int counts, Gaussian
 }
 
 /*
-* Update centroid position
-*/
-void update_centroid(Point * point, double new_x, double new_y)
-{
-
-    point->x = new_x;
-    point->y = new_y;
-
-    return ;
-}
-
-/*
 * Classify the dataset using the k-Means assignement rule.
 */
 void classify_dataset(Point* dataset, int dataset_size, Point* centroids, int k)
