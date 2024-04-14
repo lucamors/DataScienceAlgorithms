@@ -23,14 +23,15 @@ void generate_gaussian_clusters_dataset(Point* point_array, int counts, Gaussian
     {
         
 
-        int selected_distribution = i%3;
+        int selected_distribution = i%number_of_distributions;
         
         // Draw a sample from the selected distribution
         Point p = {0,0,0};
         p.x = generate_gaussian(gaussian_distribution_array[selected_distribution].mu_x,gaussian_distribution_array[selected_distribution].sigma_x);
         p.y = generate_gaussian(gaussian_distribution_array[selected_distribution].mu_y,gaussian_distribution_array[selected_distribution].sigma_y);
         
-        
+        // Set class to -1 as point is unclassified
+        p._class = -1;
         point_array[i] = p; 
     }
 

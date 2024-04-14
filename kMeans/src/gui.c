@@ -58,7 +58,7 @@ SDL_Renderer* create_renderer(SDL_Window** ptr_window)
 */
 void clear_window(SDL_Renderer** ptr_renderer)
 {
-    SDL_SetRenderDrawColor(*ptr_renderer, 0, 0, 0, 255); // RGBA
+    SDL_SetRenderDrawColor(*ptr_renderer, 255, 255, 255, 255); // RGBA
     SDL_RenderClear(*ptr_renderer);
 
     return ;
@@ -85,7 +85,14 @@ void draw_classified_dataset(Point * dataset, int dataset_size, SDL_Renderer** p
     for(int i = 0; i < dataset_size; i++)
     {
         int class = dataset[i]._class;
-        SDL_SetRenderDrawColor(*ptr_renderer,  20*class*class, 40*class+10, 40, 150); // RGBA
+        if(class == -1)
+        {
+            SDL_SetRenderDrawColor(*ptr_renderer,  0, 0, 0, 150);
+        }
+        else
+        {
+            SDL_SetRenderDrawColor(*ptr_renderer,  20*class*class, 40*class+10, 40, 100);
+        }
         SDL_Rect cr = {dataset[i].x, dataset[i].y, 2, 2};
         SDL_RenderFillRect(*ptr_renderer, &cr);
     }

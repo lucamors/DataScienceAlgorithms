@@ -21,6 +21,7 @@ int main(int argc, char* argv[])
     // Create window and renderer
     SDL_Window* window     = create_window(WINDOW_WIDTH, WINDOW_HEIGHT);
     SDL_Renderer* renderer = create_renderer(&window);
+
     // Enable alpha blending
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
@@ -34,34 +35,21 @@ int main(int argc, char* argv[])
     // Init random number generator
     srand(time(NULL));
 
-    const int N = 50000;
+    const int N = 100000;
     Point dataset[N];
+    const int k = 5;
+    GaussianDistribution gaussian_distributions[k];
 
-    GaussianDistribution g1 = {
-        .mu_x    = ((double)rand())/RAND_MAX * WINDOW_WIDTH*0.8 + WINDOW_WIDTH*0.1,
-        .mu_y    = ((double)rand())/RAND_MAX * WINDOW_HEIGHT*0.8 + WINDOW_HEIGHT*0.1,
-        .sigma_x = ((double)rand())/RAND_MAX * 40 + 10,
-        .sigma_y = ((double)rand())/RAND_MAX * 40 + 10,
-    };
+    for(int i = 0; i < k; i++)
+    {
+        gaussian_distributions[i].mu_x    = ((double)rand())/RAND_MAX * WINDOW_WIDTH*0.8 + WINDOW_WIDTH*0.1;
+        gaussian_distributions[i].mu_y    = ((double)rand())/RAND_MAX * WINDOW_HEIGHT*0.8 + WINDOW_HEIGHT*0.1;
+        gaussian_distributions[i].sigma_x = ((double)rand())/RAND_MAX * 40 + 10;
+        gaussian_distributions[i].sigma_y = ((double)rand())/RAND_MAX * 40 + 10;
+    }
+    
 
-    GaussianDistribution g2 = {
-        .mu_x    = ((double)rand())/RAND_MAX * WINDOW_WIDTH*0.8 + WINDOW_WIDTH*0.1,
-        .mu_y    = ((double)rand())/RAND_MAX * WINDOW_HEIGHT*0.8 + WINDOW_HEIGHT*0.1,
-        .sigma_x = ((double)rand())/RAND_MAX * 40 + 10,
-        .sigma_y = ((double)rand())/RAND_MAX * 40 + 10,
-    };
-
-    GaussianDistribution g3 = {
-        .mu_x    = ((double)rand())/RAND_MAX * WINDOW_WIDTH*0.8 + WINDOW_WIDTH*0.1,
-        .mu_y    = ((double)rand())/RAND_MAX * WINDOW_HEIGHT*0.8 + WINDOW_HEIGHT*0.1,
-        .sigma_x = ((double)rand())/RAND_MAX * 40 + 10,
-        .sigma_y = ((double)rand())/RAND_MAX * 40 + 10,
-    };
-
-    GaussianDistribution gaussian_distributions[3] = {g1,g2,g3};
-
-
-    generate_gaussian_clusters_dataset(dataset, N, gaussian_distributions, 3);
+    generate_gaussian_clusters_dataset(dataset, N, gaussian_distributions, k);
 
     ////////////////////////////////////////////////////////////
     // k-Means Algorithm
@@ -69,7 +57,6 @@ int main(int argc, char* argv[])
 
     // 1. Initialization Phase
 
-    const int k = 3;
     Point centroids[k];
 
     for(int i = 0; i < k; i++)
@@ -80,6 +67,10 @@ int main(int argc, char* argv[])
         centroids[i].y = dataset[selected_element].y; 
 
     }
+
+    // Drawing the dataset to screen
+    draw_classified_dataset(dataset, N, &renderer);
+    SDL_RenderPresent(renderer);
 
     // SDL Visualization Loop
     SDL_Event e;
@@ -119,8 +110,6 @@ int main(int argc, char* argv[])
                         // Recompute centroids
                         recompute_centroids(dataset,N,centroids,k);
                                                 
-
-
                         break;
 
                     default:
@@ -130,6 +119,7 @@ int main(int argc, char* argv[])
             }
         }
     }
+
     // Cleanup
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
