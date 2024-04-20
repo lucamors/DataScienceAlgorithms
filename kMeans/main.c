@@ -6,6 +6,7 @@
 
 #include "gui.h"
 #include "kmeans.h"
+#include "gaussian_distribution.h"
 
 int main(int argc, char* argv[]) 
 {   
@@ -36,6 +37,7 @@ int main(int argc, char* argv[])
 
     const int N = 100000;
     Point dataset[N];
+    
     const int k = 5;
     GaussianDistribution gaussian_distributions[k];
 

@@ -1,4 +1,5 @@
 #include "gui.h"
+#include "kmeans.h"
 #include <SDL.h>
 
 
@@ -84,7 +85,8 @@ void draw_classified_dataset(Point * dataset, int dataset_size, SDL_Renderer** p
 {
     for(int i = 0; i < dataset_size; i++)
     {
-        int class = dataset[i]._class;
+        int class = dataset[i].label;
+        
         if(class == -1)
         {
             SDL_SetRenderDrawColor(*ptr_renderer,  0, 0, 0, 150);

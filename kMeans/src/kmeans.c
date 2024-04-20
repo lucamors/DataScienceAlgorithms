@@ -1,9 +1,10 @@
+#include <math.h>
 #include <stdio.h>
 #include <float.h>
-
+#include <stdlib.h>
 
 #include "kmeans.h"
-#include "gaussian_distribution.h"
+#include "point.h"
 
 
 /*
@@ -13,31 +14,6 @@
 double compute_euclidean_distance(Point p1, Point p2)
 {
     return sqrt( (p1.x-p2.x)*(p1.x-p2.x) + (p1.y-p2.y)*(p1.y-p2.y) );
-}
-
-/*
-* Generate a dataset having "number_of_distributions" gaussian clusters 
-*/
-void generate_gaussian_clusters_dataset(Point* point_array, int counts, GaussianDistribution* gaussian_distribution_array, int number_of_distributions)
-{
-
-    for (int i = 0; i < counts; i++)
-    {
-        
-        int selected_distribution = i%number_of_distributions;
-        
-        // Draw a sample from the selected distribution
-        // new point class is initialized to -1 as point is unclassified
-        Point p = {0,0,-1};
-        p.x = generate_gaussian(gaussian_distribution_array[selected_distribution].mu_x,gaussian_distribution_array[selected_distribution].sigma_x);
-        p.y = generate_gaussian(gaussian_distribution_array[selected_distribution].mu_y,gaussian_distribution_array[selected_distribution].sigma_y);
-        
-        // Save point to array
-        point_array[i] = p; 
-    }
-
-    return ;
-    
 }
 
 /*
@@ -74,7 +50,7 @@ void classify_dataset(Point* dataset, int dataset_size, Point* centroids, int k)
     for(int i = 0; i < dataset_size; i++)
     {
         // Assign dataset element to the closest class                            
-        dataset[i]._class = classify_point(dataset[i], centroids, k); 
+        dataset[i].label = classify_point(dataset[i], centroids, k); 
     }
 
     return ;
@@ -91,29 +67,29 @@ void recompute_centroids(Point* dataset, int dataset_size, Point* centroids, int
         centroids[i].x = 0;
         centroids[i].y = 0;
 
-        // Here we can use Point '_class' member as element counter
-        centroids[i]._class = 0;
+        // Here we can use Point 'label' member as element counter
+        centroids[i].label = 0;
     }
 
 
     for(int i = 0; i < dataset_size; i++)
     {
 
-        int centroid_id = dataset[i]._class;
+        int centroid_id = dataset[i].label;
 
         centroids[centroid_id].x += dataset[i].x;
         centroids[centroid_id].y += dataset[i].y;
-        centroids[centroid_id]._class += 1;
+        centroids[centroid_id].label += 1;
     }
 
     // Compute means
     for(int i = 0; i < k; i++)
     {
-        centroids[i].x /= centroids[i]._class;
-        centroids[i].y /= centroids[i]._class;
+        centroids[i].x /= centroids[i].label;
+        centroids[i].y /= centroids[i].label;
 
-        // Assign centroid._class back to its class for consistency (optional)
-        centroids[i]._class = i;
+        // Assign centroid.label back to its class for consistency (optional)
+        centroids[i].label = i;
     }
 
     return ;
@@ -124,7 +100,7 @@ void recompute_centroids(Point* dataset, int dataset_size, Point* centroids, int
 */
 int classify_point(Point point, Point* centroids, int k)
 {
-        int current_element_class;
+        int current_elementlabel;
         // Set current dataset element to double maximum allowed value;
         double minimum_distance = DBL_MAX;
         
@@ -136,10 +112,10 @@ int classify_point(Point point, Point* centroids, int k)
             if(current_distance < minimum_distance)
             {
                 minimum_distance = current_distance;
-                current_element_class = j;
+                current_elementlabel = j;
             }
             
         }
 
-        return current_element_class;
+        return current_elementlabel;
 }

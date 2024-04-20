@@ -3,7 +3,7 @@
 #define GUI_H
 
 #include <SDL.h>
-#include "kmeans.h"
+#include "point.h"
 
 int init_sdl();
 
